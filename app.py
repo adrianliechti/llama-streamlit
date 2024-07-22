@@ -13,7 +13,7 @@ st.set_page_config(
 @st.cache_resource
 def get_models():
     return list(filter(
-       lambda m: "embed" not in m.id and "tts" not in m.id and "whisper" not in m.id,
+       lambda m: "embed" not in m.id and "tts" not in m.id and "whisper" not in m.id and "dall-e" not in m.id,
        sorted(client.models.list(), key=lambda m: m.id)
     ))
 
@@ -22,7 +22,7 @@ with st.sidebar:
     
     st.selectbox("Model", get_models(), key="model", format_func=lambda m: m.id)
     st.text_area("System Prompt", "", key="system")
-    st.slider(label="Temperature", key="temperature", min_value=0.0, max_value=1.0, value=0.0, step=.1)
+    st.slider(label="Temperature", key="temperature", min_value=0.0, max_value=2.0, value=1.0, step=.1)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
