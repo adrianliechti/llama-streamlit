@@ -1,4 +1,5 @@
 import os
+import hmac
 import streamlit as st
 from openai import OpenAI
 
@@ -9,6 +10,34 @@ client = OpenAI(
 st.set_page_config(
     page_title="LLM Platform Chat"
 )
+
+def check_password():
+    password = os.getenv("PASSWORD")
+
+    if not password:
+        return True
+
+    def password_entered():
+        if hmac.compare_digest(st.session_state["password"], password):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if st.session_state.get("password_correct", False):
+        return True
+
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+
+    return False
+
+if not check_password():
+    st.stop()
 
 @st.cache_resource
 def get_models():
