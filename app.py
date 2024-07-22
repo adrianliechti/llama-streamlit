@@ -4,7 +4,7 @@ import streamlit as st
 from openai import OpenAI
 
 client = OpenAI(
-    base_url=os.getenv("OPENAI_BASE_URL", "http://localhost:8080/oai/v1/"),
+    base_url=os.getenv("OPENAI_BASE_URL", "http://localhost:8080/v1/"),
     api_key=os.getenv("OPENAI_API_KEY", "-"))
 
 st.set_page_config(
