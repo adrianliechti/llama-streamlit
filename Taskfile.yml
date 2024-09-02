@@ -6,6 +6,10 @@ vars:
   REPOSITORY: ghcr.io/adrianliechti/llama-streamlit
 
 tasks:
+  run:
+    cmds:
+      - docker run -it --rm -p 8501:8501 -e OPENAI_BASE_URL=http://host.docker.internal:8080/v1/ $(docker build -q .)
+
   publish:
     cmds:
       - docker buildx build . --push --platform linux/amd64,linux/arm64 --tag {{.REPOSITORY}}

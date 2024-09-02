@@ -41,10 +41,8 @@ if not check_password():
 
 @st.cache_resource
 def get_models():
-    return list(filter(
-       lambda m: "embed" not in m.id and "tts" not in m.id and "whisper" not in m.id and "dall-e" not in m.id,
-       sorted(client.models.list(), key=lambda m: m.id)
-    ))
+    return [m for m in sorted(client.models.list(), key=lambda m: m.id)
+        if all(x not in m.id for x in ["embed", "tts", "whisper", "dall-e"])]
 
 with st.sidebar:
     st.title("LLM Platform Chat")
