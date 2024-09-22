@@ -3,12 +3,14 @@ import hmac
 import streamlit as st
 from openai import OpenAI
 
+title=os.getenv("TITLE", "LLM Platform Chat")
+
 client = OpenAI(
     base_url=os.getenv("OPENAI_BASE_URL", "http://localhost:8080/v1/"),
     api_key=os.getenv("OPENAI_API_KEY", "-"))
 
 st.set_page_config(
-    page_title="LLM Platform Chat"
+    page_title=title
 )
 
 def check_password():
@@ -42,14 +44,13 @@ if not check_password():
 @st.cache_resource
 def get_models():
     return [m for m in sorted(client.models.list(), key=lambda m: m.id)
-        if all(x not in m.id for x in ["embed", "tts", "whisper", "dall-e"])]
+        if all(x not in m.id for x in ["embed", "tts", "whisper", "dall-e", "flux"])]
 
 with st.sidebar:
-    st.title("LLM Platform Chat")
+    st.title(title)
     
-    st.selectbox("Model", get_models(), key="model", format_func=lambda m: m.id)
+    st.selectbox("Model", get_models(), key="model", placeholder="Select model", format_func=lambda m: m.id, index=None)
     st.text_area("System Prompt", "", key="system")
-    st.slider(label="Temperature", key="temperature", min_value=0.0, max_value=2.0, value=1.0, step=.1)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -76,7 +77,6 @@ if prompt := st.chat_input("What is up?"):
         stream = client.chat.completions.create(
             model=st.session_state.model.id,
             messages=messages,
-            temperature=st.session_state.temperature,
             stream=True,
         )
 
