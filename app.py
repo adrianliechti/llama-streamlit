@@ -2,7 +2,6 @@ import os
 import hmac
 import streamlit as st
 from openai import OpenAI
-from streamlit_local_storage import LocalStorage
 
 title=os.getenv("TITLE", "LLM Platform Chat")
 
@@ -13,13 +12,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-storage = LocalStorage()
-
 client = OpenAI(
     base_url=os.getenv("OPENAI_BASE_URL", "http://localhost:8080/v1/"),
     api_key=os.getenv("OPENAI_API_KEY", "-"))
 
-def check_password():
+def check_password():    
     password = os.getenv("PASSWORD")
 
     if not password:
@@ -28,15 +25,17 @@ def check_password():
     if st.session_state.get("password_correct", False):
         return True
         
-    if hmac.compare_digest(str(storage.getItem("password") or ''), password):
-        st.session_state["password_correct"] = True
-        return True
+    # if hmac.compare_digest(str(cookies["password"] or ""), password):
+    #     st.session_state["password_correct"] = True
+    #     return True
     
     def password_entered():
         if hmac.compare_digest(st.session_state["password"], password):
             st.session_state["password_correct"] = True
             del st.session_state["password"]
-            storage.setItem("password", password)
+            
+            # cookies["password"] = password
+            # cookies.save()
         else:
             st.session_state["password_correct"] = False
 
@@ -66,14 +65,20 @@ def get_models():
     
     return models
 
+def clear_chat_history():
+    st.session_state.messages = []
+
 with st.sidebar:
     st.title(title)
     
     st.selectbox("Model", get_models(), key="model", placeholder="Select model", format_func=lambda m: m.id, index=0)
     st.text_area("System Prompt", "", key="system")
+    
+    st.button('Clear chat history', on_click=clear_chat_history)
+
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    clear_chat_history()
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
