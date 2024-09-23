@@ -76,19 +76,19 @@ with st.sidebar:
     
     st.button('Clear chat history', on_click=clear_chat_history)
 
-
 if "messages" not in st.session_state:
     clear_chat_history()
 
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    role = message["role"]
+    content = message["content"]
+    
+    with st.chat_message(role):
+        st.write(content)
 
 if prompt := st.chat_input("Message " + title):
     st.session_state.messages.append({"role": "user", "content": prompt})
-
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    st.chat_message("user").write(prompt)
 
     with st.chat_message("assistant"):
         messages = []
