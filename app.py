@@ -1,6 +1,8 @@
 import os
 import hmac
+import re
 import streamlit as st
+
 from openai import OpenAI
 
 title=os.getenv("TITLE", "LLM Platform Chat")
@@ -65,7 +67,7 @@ def get_models():
     
     return models
 
-def clear_chat_history():
+def reset_chat():
     st.session_state.messages = []
 
 with st.sidebar:
@@ -74,10 +76,17 @@ with st.sidebar:
     st.selectbox("Model", get_models(), key="model", placeholder="Select model", format_func=lambda m: m.id, index=0)
     st.text_area("System Prompt", "", key="system")
     
-    st.button('Clear chat history', on_click=clear_chat_history)
+    st.button('Clear chat history', on_click=reset_chat)
 
 if "messages" not in st.session_state:
-    clear_chat_history()
+    reset_chat()
+    
+def decorate_message(content):
+    for url, format in re.findall(r'\[.*?\]\((https?://[^\s\)]+?\.(wav|mp3|ogg))\)', content):
+        st.audio(url, format="audio/" + format, autoplay=True)
+    
+    for url, format in  re.findall(r'\[.*?\]\((https?://[^\s\)]+?\.(mp4|webm))\)', content):
+        st.video(url, format="video/" + format, autoplay=True)
 
 for message in st.session_state.messages:
     role = message["role"]
@@ -85,6 +94,7 @@ for message in st.session_state.messages:
     
     with st.chat_message(role):
         st.write(content)
+        decorate_message(content)
 
 if prompt := st.chat_input("Message " + title):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -104,7 +114,18 @@ if prompt := st.chat_input("Message " + title):
             messages=messages,
             stream=True,
         )
-
+        
         response = st.write_stream(stream)
+        decorate_message(response)
     
     st.session_state.messages.append({"role": "assistant", "content": response})
+
+# if len(st.session_state.messages) == 0:
+#     st.title("Hallo!")
+    
+#     row1 = st.columns(3)
+#     row2 = st.columns(3)
+    
+#     for col in row1 + row2:
+#         tile = col.container(height=120)
+#         tile.title(":balloon:")
