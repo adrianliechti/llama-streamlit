@@ -10,7 +10,10 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY", "-"))
 
 st.set_page_config(
-    page_title=title
+    page_icon=":robot_face:",
+    page_title=title,
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
 def check_password():
@@ -43,13 +46,24 @@ if not check_password():
 
 @st.cache_resource
 def get_models():
-    return [m for m in sorted(client.models.list(), key=lambda m: m.id)
+    models = [m for m in sorted(client.models.list(), key=lambda m: m.id)
         if all(x not in m.id for x in ["embed", "tts", "whisper", "dall-e", "flux"])]
+    
+    default = os.environ.get('MODEL')
+    
+    if default:
+        list = [m.id for m in models]
+        
+        if default in list:
+            index = list.index(default)
+            models.insert(0, models.pop(index))
+    
+    return models
 
 with st.sidebar:
     st.title(title)
     
-    st.selectbox("Model", get_models(), key="model", placeholder="Select model", format_func=lambda m: m.id, index=None)
+    st.selectbox("Model", get_models(), key="model", placeholder="Select model", format_func=lambda m: m.id, index=0)
     st.text_area("System Prompt", "", key="system")
 
 if "messages" not in st.session_state:
@@ -59,7 +73,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("Message " + title):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     with st.chat_message("user"):
