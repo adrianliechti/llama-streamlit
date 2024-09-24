@@ -1,5 +1,4 @@
 import os
-import hmac
 import re
 import streamlit as st
 
@@ -17,39 +16,6 @@ st.set_page_config(
 client = OpenAI(
     base_url=os.getenv("OPENAI_BASE_URL", "http://localhost:8080/v1/"),
     api_key=os.getenv("OPENAI_API_KEY", "-"))
-
-def check_password():    
-    password = os.getenv("PASSWORD")
-
-    if not password:
-        return True
-    
-    if st.session_state.get("password_correct", False):
-        return True
-        
-    # if hmac.compare_digest(str(cookies["password"] or ""), password):
-    #     st.session_state["password_correct"] = True
-    #     return True
-    
-    def password_entered():
-        if hmac.compare_digest(st.session_state["password"], password):
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]
-            
-            # cookies["password"] = password
-            # cookies.save()
-        else:
-            st.session_state["password_correct"] = False
-
-    st.text_input("Password", type="password", on_change=password_entered, key="password")
-    
-    if "password_correct" in st.session_state:
-        st.error("😕 Password incorrect")
-
-    return False
-
-if not check_password():
-    st.stop()
 
 @st.cache_resource
 def get_models():
