@@ -86,12 +86,8 @@ if prompt := st.chat_input("Message " + title):
     
     st.session_state.messages.append({"role": "assistant", "content": response})
 
-# if len(st.session_state.messages) == 0:
-#     st.title("Hallo!")
+if len(st.session_state.messages) == 0:
+    col1, col2, col3 = st.columns(3, vertical_alignment="center")
     
-#     row1 = st.columns(3)
-#     row2 = st.columns(3)
-    
-#     for col in row1 + row2:
-#         tile = col.container(height=120)
-#         tile.title(":balloon:")
+    with col2:
+        st.image("assets/logo.png")
