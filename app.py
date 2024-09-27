@@ -87,7 +87,8 @@ if prompt := st.chat_input("Message " + title):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 if len(st.session_state.messages) == 0:
-    col1, col2, col3 = st.columns(3, vertical_alignment="center")
-    
-    with col2:
-        st.image("assets/logo.png")
+   st.html("""
+           <div style="display: flex; justify-content: center; align-items: center; height: 50vh">
+                <img src="/app/static/logo.png" style="max-height: 100%; width: auto;">
+            </div>
+    """)
