@@ -22,6 +22,11 @@ def get_models():
     models = [m for m in sorted(client.models.list(), key=lambda m: m.id)
         if all(x not in m.id for x in ["embed", "tts", "whisper", "dall-e", "flux"])]
     
+    filter = os.environ.get('MODELS')
+    
+    if filter:
+        models = [m for m in models if m.id in filter.split(',')]
+    
     default = os.environ.get('MODEL')
     
     if default:
