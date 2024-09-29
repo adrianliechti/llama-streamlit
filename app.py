@@ -68,6 +68,13 @@ for message in st.session_state.messages:
         decorate_message(content)
 
 if prompt := st.chat_input("Message " + title):
+    if prompt.startswith("/"):
+        match prompt:
+            case "/reset":
+                reset_chat()
+    
+        st.rerun()
+    
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
