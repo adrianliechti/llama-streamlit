@@ -36,7 +36,7 @@ func main() {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" && r.URL.Path == "/" {
-			resp, err := http.Get("http://localhost:8501")
+			resp, err := http.Get(targetURL.String())
 
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadGateway)
@@ -84,7 +84,7 @@ func main() {
 				"icons": []map[string]any{
 					{
 						"src":   "/app/static/logo.png",
-						"sizes": "800x800",
+						"sizes": "512x512",
 						"type":  "image/png",
 					},
 				},

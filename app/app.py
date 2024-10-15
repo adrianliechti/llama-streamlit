@@ -99,8 +99,8 @@ if prompt := st.chat_input("Message " + title):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 if len(st.session_state.messages) == 0:
-   st.html("""
-           <div style="display: flex; justify-content: center; align-items: center; height: 50vh">
+    st.html("""
+            <div style="display: flex; justify-content: center; align-items: center; height: 50vh">
                 <img src="/app/static/logo.png" style="max-height: 100%; width: auto;">
             </div>
-    """)
+            """)
