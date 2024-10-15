@@ -1,12 +1,16 @@
-FROM python:3-slim
+FROM golang:1 AS launcher
 
-WORKDIR /app
+WORKDIR /src
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY go.mod ./
+RUN go mod download
 
-COPY .streamlit/ .streamlit/
-COPY static/ static/
-COPY app.py .
+COPY *.go ./
+RUN CGO_ENABLED=0 GOOS=linux go build -o launcher
 
-CMD [ "streamlit", "run", "app.py" ]
+
+FROM ghcr.io/adrianliechti/llama-streamlit
+
+COPY --from=launcher /src/launcher /launcher
+
+CMD ["/launcher"]
